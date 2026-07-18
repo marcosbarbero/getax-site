@@ -6,7 +6,16 @@
 <title>{% if page.title %}{{ page.title }} · {% endif %}GetAX</title>
 {% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><path d='M8 46 A 26 26 0 0 1 56 46' fill='none' stroke='%237C8794' stroke-width='5'/><path d='M32 48 L23 29 Q32 20 41 29 Z' fill='%23D9541F'/></svg>">
-<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+{% comment %}
+  Asset fingerprint. GitHub Pages forces Cache-Control: max-age=600 on assets and
+  Fastly caches by full URL, so a plain /assets/main.css stays stale at the edge for
+  up to 10 min after a deploy. Tag the URL with the deployed commit so every deploy
+  mints a URL the CDN has never seen. build_revision is the commit SHA (Pages sets it);
+  site.time is the build clock, the fallback for local `jekyll serve`.
+{% endcomment %}
+{% assign asset_v = site.github.build_revision %}
+{% unless asset_v %}{% assign asset_v = site.time | date: '%s' %}{% endunless %}
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}?v={{ asset_v | slice: 0, 8 }}">
 </head>
 <body>
 {{ content }}
