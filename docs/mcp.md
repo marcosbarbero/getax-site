@@ -47,19 +47,30 @@ Or the equivalent JSON in any MCP-capable client:
 
 Run it from the repository you want scored — the server works on the current directory.
 
-## The three tools
+## The tools
+
+Five, spanning read and write:
 
 - **`get_readiness`** — the current AX score and its five signals. Deterministic.
 - **`get_findings`** — the ranked, attributed gaps a scan found, each a *candidate* to
-  adjudicate: an id, the signal, the claim, and the points at stake.
-- **`propose_exemption`** — the agent's verdict on a finding, one of three, chosen by
-  whether the finding is false, being fixed, or true-but-managed:
+  adjudicate: an id, the signal, the claim, and the points at stake. Findings settled in a
+  prior session come back separately, under `already_adjudicated`, so the agent isn't
+  re-shown what's already decided.
+- **`explain_finding`** — the full evidence behind one finding (a `Signal/Key` id): the
+  sub-signal's measured value, its ceiling, the specific evidence the scan saw, and any
+  blind-spot note. Call it before adjudicating something you're unsure about — decide on
+  what the scan actually measured, not the one-line claim.
+- **`list_adjudications`** — the committed ledger: every finding a prior session settled,
+  with its verdict, reason, and citation. The repo's inherited memory.
+- **`propose_exemption`** — the agent's verdict on a finding, one of three:
   - **`confirmed`** — it's real and the agent will fix it. Nothing is staged; the
     deduction stands until the code changes.
   - **`refuted`** — it's *false*: the rule mis-measures your repo (say, a mandatory
     `any` at a JSON boundary scored as an escape hatch). Must carry a `path:line`
     citation proving it. GetAX re-verifies the citation and stages a verified-claim
-    exemption that **restores the points once you commit it.**
+    exemption; once you commit it, it restores the points **under a scoring model that
+    honours claims** (today's model records and reads it back, but does not yet recompute
+    from it — that lands with a model version bump, never silently).
   - **`managed`** — it's *true, but under a documented remediation policy* (a grandfather
     clause, a shrink-only ratchet). Must cite the policy. GetAX records it; **no points
     are restored** — the debt is real — but it's marked *tracked*, not pretended away.
@@ -68,13 +79,23 @@ Run it from the repository you want scored — the server works on the current d
   just because a grandfather clause exists. An unverifiable citation is rejected and the
   finding stands.
 
+## One command: `raise_readiness`
+
+The server also ships an MCP **prompt** — a slash command that runs the whole loop for
+you. Invoke it and the agent is told to pull the readiness score, walk the open findings,
+adjudicate each (fixing, refuting, or managing), and re-check — with the same routing rule
+the tools carry, so the guidance can't drift. In Claude Code it appears as
+`/getax:raise_readiness`.
+
 ## The loop
 
 Ask your agent: *"use getax to check this repo's agent-readiness and work the findings."*
 What happens:
 
 1. The agent calls **`get_findings`** and reads them with the context you don't have to
-   give it — it already has the tree.
+   give it — it already has the tree. Anything under `already_adjudicated` was settled
+   before; it leaves those alone. If a finding is unclear, **`explain_finding`** gives it
+   the evidence the scan saw.
 2. For a **real** finding, it fixes the code and you re-run to watch the score rise.
 3. For a **false** one — a rule mis-measuring your repo, like a flat registry counted as a
    monolith — it calls **`propose_exemption`** with verdict `refuted` and a citation that
@@ -85,7 +106,9 @@ What happens:
    This is the honest middle: you don't pretend it away, and you don't over-promise a fix.
 5. You **review the staged entries in the diff and commit them.** Each carries its reason
    and citation, so a teammate (or a future you) can see exactly why the number is what it
-   is — and a refutation only moves the score once it's committed.
+   is. A committed refutation restores points only under a claims-honouring scoring model
+   (a model version bump away, never silent); today it is recorded and read back, and the
+   deterministic score stays put.
 
 That committed `.getax/` is the repo's memory: a newcomer who clones it inherits the
 settled adjudications, and GetAX stops re-raising what's already been answered.
