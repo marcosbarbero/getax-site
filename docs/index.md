@@ -19,6 +19,12 @@ gate that blocks regressions on every push.
   gate: a baseline, a pre-push hook, and CI, so your agent-readiness can only ratchet
   up. This is where GetAX stops being a tool you remember and becomes one you rely on.
 
+## Going deeper
+
+- **[Judgment — the model-graded probe](/docs/judgment/)** — the readiness questions a
+  deterministic check cannot answer (is this long file a monolith or a flat registry?),
+  asked of a model you configure. Opt-in, advisory, and it never moves your score.
+
 ## Reference
 
 - **[Configuration](/docs/configuration/)** — `.getax/settings.json`: exemptions,
