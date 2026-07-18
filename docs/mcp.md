@@ -67,10 +67,10 @@ Five, spanning read and write:
     deduction stands until the code changes.
   - **`refuted`** — it's *false*: the rule mis-measures your repo (say, a mandatory
     `any` at a JSON boundary scored as an escape hatch). Must carry a `path:line`
-    citation proving it. GetAX re-verifies the citation and stages a verified-claim
-    exemption; once you commit it, it restores the points **under a scoring model that
-    honours claims** (today's model records and reads it back, but does not yet recompute
-    from it — that lands with a model version bump, never silently).
+    citation proving it. GetAX re-verifies the citation and records the refutation. **It
+    changes no score today** — the record is read back so the finding isn't re-raised, but
+    wiring a refutation into the scored config is separate work, and would restore points
+    only under a claims-honouring model (a version bump, never silent).
   - **`managed`** — it's *true, but under a documented remediation policy* (a grandfather
     clause, a shrink-only ratchet). Must cite the policy. GetAX records it; **no points
     are restored** — the debt is real — but it's marked *tracked*, not pretended away.
@@ -78,6 +78,32 @@ Five, spanning read and write:
   Refute only what's false; *manage* what's true-but-policied — don't refute real debt
   just because a grandfather clause exists. An unverifiable citation is rejected and the
   finding stands.
+
+## Auditable, not asserted
+
+The oldest complaint about any readiness scanner is that a finding is a headline number
+you can only argue with by reproducing it. `explain_finding` answers that. It hands back
+the measured value, its ceiling, and the **evidence with its population named** — for
+file size, `N source files (line-weighted; excludes tests, generated, and vendored)`. An
+outsider can rebuild that number from `git ls-files` alone, with no reference to our
+implementation, and confirm it lands where we say. That is the difference between a score
+you must *believe* and one you can *audit* — and it is why the number is worth gating a
+build on.
+
+## Load the companion skill
+
+GetAX ships an agent **skill** — packaged instructions that teach your agent to adjudicate
+and fix findings the honest way: fix the real ones, refute the false ones with a citation,
+mark true-but-policied debt as managed, and *never chase the number*. Install it alongside
+the server:
+
+```bash
+getax skill install getax-readiness
+```
+
+It lands in `.claude/skills/` and your agent picks it up on the next connect;
+`getax skill list` shows what's bundled. The skill carries a fix recipe for every signal —
+so when your agent confirms a finding, it knows what "fixed" actually looks like.
 
 ## One command: `raise_readiness`
 
