@@ -1,0 +1,97 @@
+<section id="validate" class="validator">
+  <p>Paste your <code>.getax/settings.json</code> below — it's checked against the engine's own
+     rules, live, in your browser. Nothing is sent anywhere. (Verified claims like
+     <code>exclude</code> and <code>archetype</code> are also checked against your <em>repo</em> at scan
+     time; this validates the shape.)</p>
+  <textarea id="cfg" spellcheck="false" autocomplete="off" aria-label="Your .getax/settings.json">{
+  "$schema": "https://getax.app/schema/getax.v1.json",
+  "version": 1,
+  "model": "v4",
+  "archetype": "service",
+  "exclude": [
+    { "path": "**/*.pb.go", "claim": "generated", "reason": "protoc output, not our own code" }
+  ]
+}</textarea>
+  <div id="vout" class="vout" aria-live="polite"></div>
+</section>
+<script>
+(function () {
+  var TOP = ["$schema","version","model","weights","ignore","inputs","overrides","exclude","posture","archetype","issues"];
+  var CLAIMS = ["generated","vendored","data"], GATES = ["pre-push-hook"];
+  var ARCHES = ["general","service","library","cli","data-heavy"];
+  var DATE = /^\d{4}-\d{2}-\d{2}$/;
+  function strs(v){ return Array.isArray(v) && v.every(function(x){return typeof x==="string";}); }
+  function validate(text){
+    var errs = [], warns = [], c;
+    try { c = JSON.parse(text); } catch (e) { return {errs:["Not valid JSON — "+e.message], warns:[]}; }
+    if (typeof c!=="object" || c===null || Array.isArray(c)) return {errs:["The config must be a JSON object."], warns:[]};
+    Object.keys(c).forEach(function(k){ if(TOP.indexOf(k)<0) errs.push('Unknown field "'+k+'" — GetAX rejects unknown fields, because a typo that silently does nothing is worse than an error.'); });
+    if (c.version===undefined) errs.push("`version` is required.");
+    else if (c.version!==1) errs.push("`version` must be 1.");
+    if (c.model===undefined) errs.push("`model` is required — pin the scoring model so a CLI upgrade can't silently move your score.");
+    else if (typeof c.model!=="string") errs.push('`model` must be a string, e.g. "v3" or "v4".');
+    var v4 = c.model==="v4";
+    if (c.weights!==undefined){
+      var w=c.weights, keys=["T","B","D","S","E"], sum=0, num=true;
+      if (typeof w!=="object"||w===null||Array.isArray(w)) errs.push("`weights` must be an object.");
+      else { keys.forEach(function(k){ if(typeof w[k]!=="number"){num=false; errs.push("weights."+k+" must be a number.");} else sum+=w[k]; });
+        Object.keys(w).forEach(function(k){ if(keys.indexOf(k)<0) errs.push('weights: unknown key "'+k+'".'); });
+        if (num && Math.abs(sum-1)>0.001) errs.push("weights must sum to 1.0 (yours sum to "+sum.toFixed(2)+") — rejected, not rescaled."); }
+    }
+    if (c.ignore!==undefined && !strs(c.ignore)) errs.push("`ignore` must be an array of strings.");
+    if (c.inputs!==undefined){
+      if (typeof c.inputs!=="object"||Array.isArray(c.inputs)) errs.push("`inputs` must be an object.");
+      else Object.keys(c.inputs).forEach(function(k){ if(["coverage","junit","sarif","openapi"].indexOf(k)<0) errs.push('inputs: unknown key "'+k+'".'); else if(!strs(c.inputs[k])) errs.push("inputs."+k+" must be an array of strings."); });
+    }
+    if (c.overrides!==undefined){
+      if(!Array.isArray(c.overrides)) errs.push("`overrides` must be an array.");
+      else c.overrides.forEach(function(o,i){
+        if(typeof o!=="object"||o===null){errs.push("overrides["+i+"] must be an object.");return;}
+        Object.keys(o).forEach(function(k){ if(["rule","reason","scope","author","expires"].indexOf(k)<0) errs.push("overrides["+i+']: unknown field "'+k+'".'); });
+        if(!o.rule) errs.push("overrides["+i+'] needs a "rule".');
+        if(!o.reason||String(o.reason).trim().length<20) errs.push("overrides["+i+"] needs a real reason (at least 20 characters) — the reason is the teaching signal.");
+        if(o.expires && !DATE.test(o.expires)) errs.push("overrides["+i+"] expires must be YYYY-MM-DD.");
+      });
+    }
+    if (c.exclude!==undefined){
+      if(!v4) errs.push('`exclude` requires "model": "v4".');
+      if(!Array.isArray(c.exclude)) errs.push("`exclude` must be an array.");
+      else c.exclude.forEach(function(e,i){
+        if(typeof e!=="object"||e===null){errs.push("exclude["+i+"] must be an object.");return;}
+        Object.keys(e).forEach(function(k){ if(["path","claim","reason","expires"].indexOf(k)<0) errs.push("exclude["+i+']: unknown field "'+k+'".'); });
+        if(!e.path) errs.push("exclude["+i+'] needs a "path".');
+        if(CLAIMS.indexOf(e.claim)<0) errs.push("exclude["+i+"] claim must be one of: "+CLAIMS.join(", ")+".");
+        if(!e.reason||String(e.reason).trim().length<20) errs.push("exclude["+i+"] needs a real reason (at least 20 characters).");
+        if(e.expires && !DATE.test(e.expires)) errs.push("exclude["+i+"] expires must be YYYY-MM-DD.");
+      });
+    }
+    if (c.posture!==undefined){
+      if(!v4) errs.push('`posture` requires "model": "v4".');
+      if(typeof c.posture!=="object"||Array.isArray(c.posture)) errs.push("`posture` must be an object.");
+      else { Object.keys(c.posture).forEach(function(k){ if(k!=="gate") errs.push('posture: unknown field "'+k+'".'); });
+        if(c.posture.gate && GATES.indexOf(c.posture.gate)<0) errs.push("posture.gate must be one of: "+GATES.join(", ")+"."); }
+    }
+    if (c.archetype!==undefined){
+      if(!v4) errs.push('`archetype` requires "model": "v4".');
+      if(ARCHES.indexOf(c.archetype)<0) errs.push("archetype must be one of: "+ARCHES.join(", ")+".");
+      if(c.weights!==undefined) errs.push("Set `archetype` OR `weights`, not both — an archetype IS a weight profile.");
+    }
+    if (c.issues!==undefined){
+      if(typeof c.issues!=="object"||Array.isArray(c.issues)) errs.push("`issues` must be an object.");
+      else Object.keys(c.issues).forEach(function(k){ if(["labels","assignees"].indexOf(k)<0) errs.push('issues: unknown key "'+k+'".'); else if(!strs(c.issues[k])) errs.push("issues."+k+" must be an array of strings."); });
+    }
+    if (v4 && (c.exclude||c.archetype||c.posture)) warns.push("Verified claims (exclude / posture / archetype) are also checked against your REPO at scan time — this confirms the shape, not that the claims hold.");
+    return {errs:errs, warns:warns};
+  }
+  function esc(s){ return String(s).replace(/[&<>]/g, function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[ch];}); }
+  var ta = document.getElementById('cfg'), out = document.getElementById('vout'); if (!ta || !out) return;
+  function run(){
+    var r = validate(ta.value), h = '';
+    if (r.errs.length===0) h += '<span class="ok">✓ Valid — this is a well-formed .getax/settings.json.</span>';
+    r.errs.forEach(function(m){ h += '<div class="row"><b>✗</b> '+esc(m)+'</div>'; });
+    r.warns.forEach(function(m){ h += '<div class="row warn"><b>note</b> '+esc(m)+'</div>'; });
+    out.innerHTML = h;
+  }
+  ta.addEventListener('input', run); run();
+})();
+</script>

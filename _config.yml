@@ -1,0 +1,5 @@
+title: GetAX
+description: Agentic Experience governance — deterministic AI-readiness scoring
+url: https://getax.app
+# GitHub Pages provides Jekyll; no custom plugins, so the build is reproducible.
+exclude: [README.md]

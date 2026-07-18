@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% if page.title %}{{ page.title }} · {% endif %}GetAX</title>
+{% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><path d='M8 46 A 26 26 0 0 1 56 46' fill='none' stroke='%237C8794' stroke-width='5'/><path d='M32 48 L23 29 Q32 20 41 29 Z' fill='%23D9541F'/></svg>">
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+</head>
+<body>
+{{ content }}
+<script>
+  // Theme toggle: stamp data-theme, overriding the media query in both directions.
+  (function () {
+    var btn = document.getElementById('themebtn'); if (!btn) return;
+    btn.addEventListener('click', function () {
+      var root = document.documentElement, dark = matchMedia('(prefers-color-scheme: dark)').matches;
+      var cur = root.getAttribute('data-theme') || (dark ? 'dark' : 'light');
+      root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+    });
+  })();
+  // Build the sidebar TOC from the page's own headings, then scroll-spy it. Markdown
+  // stays pure — no TOC markup in the content.
+  (function () {
+    var content = document.getElementById('content'), toc = document.getElementById('toc');
+    if (!content || !toc) return;
+    var heads = [].slice.call(content.querySelectorAll('h2[id], h3[id]'));
+    toc.innerHTML = heads.map(function (h) {
+      return '<a href="#' + h.id + '"' + (h.tagName === 'H3' ? ' class="sub"' : '') + '>' + h.textContent + '</a>';
+    }).join('');
+    if (!('IntersectionObserver' in window)) return;
+    var links = {}; [].forEach.call(toc.querySelectorAll('a'), function (a) { links[a.getAttribute('href').slice(1)] = a; });
+    var seen = new Set();
+    var obs = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) seen.add(e.target.id); else seen.delete(e.target.id); });
+      var active = heads.find(function (h) { return seen.has(h.id); });
+      [].forEach.call(toc.querySelectorAll('a'), function (a) { a.classList.remove('on'); });
+      if (active && links[active.id]) links[active.id].classList.add('on');
+    }, { rootMargin: '-8% 0px -75% 0px' });
+    heads.forEach(function (h) { obs.observe(h); });
+  })();
+</script>
+</body>
+</html>
