@@ -31,7 +31,7 @@
              gap:1rem;flex-wrap:wrap;padding:1.6rem 0 1.3rem;border-bottom:1px solid var(--etch);
              margin-bottom:2.4rem}
   .lockup{display:flex;align-items:center;gap:.55rem}
-  .lockup__w{font-family:var(--mono);font-weight:700;font-size:1.15rem;letter-spacing:-.02em}
+  .lockup__w{font-family:var(--mono);font-weight:700;font-size:1.15rem;letter-spacing:-.02em;color:var(--bone)}
   .lockup__w i{color:var(--ember);font-style:normal}
   .toplabel{font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
             color:var(--steel)}
