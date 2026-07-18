@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GetAX</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><path d='M8 46 A 26 26 0 0 1 56 46' fill='none' stroke='%237C8794' stroke-width='5'/><path d='M32 48 L23 29 Q32 20 41 29 Z' fill='%23D9541F'/></svg>">
+<style>
+  :root{--ground:#191713;--bone:#EDE8DF;--bone-dim:#A9A296;--steel:#7C8794;--ember:#D9541F;--etch:#3A362E;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,monospace;--serif:"Iowan Old Style",Palatino,Georgia,serif}
+  @media (prefers-color-scheme:light){:root{--ground:#F2EDE3;--bone:#211E18;--bone-dim:#5E574B;--steel:#5C6670;--ember:#BC3F0E;--etch:#C9BFA9}}
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--ground);color:var(--bone);font-family:var(--serif);line-height:1.6;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+  .wrap{max-width:34rem;text-align:center}
+  .lockup{display:flex;align-items:center;justify-content:center;gap:.6rem;margin-bottom:1.4rem}
+  .lockup__w{font-family:var(--mono);font-weight:700;font-size:1.6rem;letter-spacing:-.02em}
+  .lockup__w i{color:var(--ember);font-style:normal}
+  h1{font-family:var(--mono);font-size:1.05rem;font-weight:600;letter-spacing:.02em;margin-bottom:1rem;color:var(--bone-dim)}
+  p{color:var(--bone-dim);max-width:46ch;margin:0 auto 1rem}
+  a{color:var(--ember);text-underline-offset:3px}
+  .foot{font-family:var(--mono);font-size:.7rem;color:var(--steel);letter-spacing:.06em;margin-top:2rem}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="lockup">
+      <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M8 46 A 26 26 0 0 1 56 46" fill="none" stroke="#7C8794" stroke-width="4"/>
+        <path d="M32 48 L23 29 Q32 20 41 29 Z" fill="#D9541F"/>
+      </svg>
+      <span class="lockup__w">get<i>ax</i></span>
+    </div>
+    <h1>Agentic Experience governance</h1>
+    <p>GetAX scores — deterministically — how ready a repository is for autonomous
+       agents to work in, and shows the reasoning behind every point.</p>
+    <p>Configuration schema:
+       <a href="/schema/getax.v1.json"><code>/schema/getax.v1.json</code></a></p>
+    <div class="foot">More soon.</div>
+  </div>
+</body>
+</html>
