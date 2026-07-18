@@ -1,0 +1,64 @@
+<!doctype html>
+<!-- Source for og.png (the social-share card). Regenerate:
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless \
+       --force-device-scale-factor=2 --hide-scrollbars --screenshot=og.png \
+       --window-size=1200,630 file://$PWD/og.html -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root{
+    --ground:#191713; --bone:#EDE8DF; --bone-dim:#A9A296;
+    --ember:#D9541F; --steel:#7C8794; --etch:#3A362E; --panel:#22201B;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1200px;height:630px;overflow:hidden}
+  body{
+    background:
+      radial-gradient(900px 520px at 82% 120%, rgba(217,84,31,.10), transparent 60%),
+      var(--ground);
+    color:var(--bone);
+    font-family:-apple-system,"Helvetica Neue",system-ui,sans-serif;
+    position:relative;
+  }
+  /* A faint oversized gauge, the brand mark as atmosphere. */
+  .watermark{position:absolute;right:-120px;bottom:-200px;width:720px;height:720px;opacity:.08}
+  .frame{position:absolute;inset:0;border:1px solid var(--etch)}
+  .pad{position:absolute;inset:0;padding:84px 90px;display:flex;flex-direction:column;justify-content:space-between}
+  .lockup{display:flex;align-items:center;gap:22px}
+  .lockup svg{width:76px;height:76px}
+  .word{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-weight:700;font-size:78px;letter-spacing:-.03em;color:var(--bone)}
+  .word i{color:var(--ember);font-style:normal}
+  .eyebrow{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:20px;letter-spacing:.28em;text-transform:uppercase;color:var(--steel);margin-bottom:26px}
+  .headline{font-size:56px;line-height:1.14;font-weight:600;letter-spacing:-.02em;max-width:20ch}
+  .headline .em{color:var(--ember)}
+  .foot{display:flex;align-items:center;justify-content:space-between;font-family:ui-monospace,"SF Mono",Menlo,monospace}
+  .url{font-size:26px;color:var(--ember)}
+  .tag{font-size:20px;color:var(--bone-dim);letter-spacing:.02em}
+</style>
+</head>
+<body>
+  <svg class="watermark" viewBox="0 0 64 64" aria-hidden="true">
+    <path d="M8 46 A 26 26 0 0 1 56 46" fill="none" stroke="#7C8794" stroke-width="3"/>
+    <path d="M32 48 L23 29 Q32 20 41 29 Z" fill="#D9541F"/>
+  </svg>
+  <div class="frame"></div>
+  <div class="pad">
+    <div class="lockup">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M8 46 A 26 26 0 0 1 56 46" fill="none" stroke="#7C8794" stroke-width="4"/>
+        <path d="M32 48 L23 29 Q32 20 41 29 Z" fill="#D9541F"/>
+      </svg>
+      <span class="word">get<i>ax</i></span>
+    </div>
+    <div>
+      <div class="eyebrow">Agentic Experience governance</div>
+      <div class="headline">How ready is your repository for <span class="em">autonomous agents</span>?</div>
+    </div>
+    <div class="foot">
+      <span class="url">getax.app</span>
+      <span class="tag">Scored deterministically · every point explained</span>
+    </div>
+  </div>
+</body>
+</html>

@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{% if page.title %}{{ page.title }} · {% endif %}GetAX</title>
 {% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
+{% comment %} Social share (Open Graph + Twitter) — the card was missing, so links pasted bare. {% endcomment %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="GetAX">
+<meta property="og:title" content="{% if page.title %}{{ page.title }} · GetAX{% else %}GetAX — Agentic Experience governance{% endif %}">
+<meta property="og:description" content="{{ page.description | default: site.description }}">
+<meta property="og:url" content="{{ page.url | absolute_url }}">
+<meta property="og:image" content="{{ '/og.png' | absolute_url }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{% if page.title %}{{ page.title }} · GetAX{% else %}GetAX — Agentic Experience governance{% endif %}">
+<meta name="twitter:description" content="{{ page.description | default: site.description }}">
+<meta name="twitter:image" content="{{ '/og.png' | absolute_url }}">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><path d='M8 46 A 26 26 0 0 1 56 46' fill='none' stroke='%237C8794' stroke-width='5'/><path d='M32 48 L23 29 Q32 20 41 29 Z' fill='%23D9541F'/></svg>">
 {% comment %}
   Asset fingerprint. GitHub Pages forces Cache-Control: max-age=600 on assets and
