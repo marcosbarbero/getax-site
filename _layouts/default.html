@@ -62,6 +62,40 @@
     }, { rootMargin: '-8% 0px -75% 0px' });
     heads.forEach(function (h) { obs.observe(h); });
   })();
+
+  // Copy button on every code block. Vanilla — no library — to keep the page
+  // self-contained. The code text is captured BEFORE the button is inserted, so the
+  // button's own label never leaks into what gets copied.
+  (function () {
+    var blocks = document.querySelectorAll('pre');
+    [].forEach.call(blocks, function (pre) {
+      var codeEl = pre.querySelector('code') || pre;
+      var source = codeEl.textContent.replace(/\n+$/, '');
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'copy-btn';
+      btn.textContent = 'copy';
+      btn.setAttribute('aria-label', 'Copy code to clipboard');
+      var reset;
+      btn.addEventListener('click', function () {
+        var done = function (ok) {
+          btn.textContent = ok ? 'copied ✓' : 'press ⌘C';
+          btn.classList.toggle('copied', ok);
+          clearTimeout(reset);
+          reset = setTimeout(function () {
+            btn.textContent = 'copy';
+            btn.classList.remove('copied');
+          }, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(source).then(function () { done(true); }, function () { done(false); });
+        } else {
+          done(false);
+        }
+      });
+      pre.appendChild(btn);
+    });
+  })();
 </script>
 </body>
 </html>

@@ -99,10 +99,17 @@
   .chip--moves{color:var(--patina)} .chip--inert{color:var(--amber)}
 
   /* ── code blocks ──────────────────────────────────────── */
-  pre{background:var(--panel-2);border:1px solid var(--etch);border-left:3px solid var(--ember);
+  pre{position:relative;background:var(--panel-2);border:1px solid var(--etch);border-left:3px solid var(--ember);
       padding:1rem 1.1rem;overflow-x:auto;font-family:var(--mono);font-size:.82rem;line-height:1.6;
       color:var(--bone);margin:1rem 0}
   pre code{background:none;border:none;padding:0;font-size:1em}
+  .copy-btn{position:absolute;top:.4rem;right:.4rem;font-family:var(--mono);font-size:.56rem;
+      letter-spacing:.1em;text-transform:uppercase;color:var(--steel);background:var(--panel);
+      border:1px solid var(--etch);padding:.3rem .5rem;line-height:1;cursor:pointer;
+      transition:color .12s,border-color .12s;-webkit-font-smoothing:antialiased}
+  .copy-btn:hover{color:var(--ember);border-color:var(--ember)}
+  .copy-btn:focus-visible{outline:2px solid var(--ember);outline-offset:2px}
+  .copy-btn.copied{color:var(--patina);border-color:var(--patina)}
   .tok-k{color:var(--steel)} .tok-s{color:var(--patina)} .tok-n{color:var(--amber)}
 
   /* ── tables ───────────────────────────────────────────── */
