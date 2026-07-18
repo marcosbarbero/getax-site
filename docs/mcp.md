@@ -84,11 +84,15 @@ Five, spanning read and write:
 The oldest complaint about any readiness scanner is that a finding is a headline number
 you can only argue with by reproducing it. `explain_finding` answers that. It hands back
 the measured value, its ceiling, and — for a signal like file size — the **exact
-population predicate**: the full list of source extensions that count, the path substrings
-excluded (`/vendor/`, `/node_modules/`, `/src/test/`, …), and the filename suffixes
-excluded (`_test.go`, `.pb.go`, …), sourced straight from the engine so it can't drift
-from the code. An outsider rebuilds the number from `git ls-files` alone and confirms it
-lands *exactly* where we say — not approximately, which reads as an undisclosed fudge.
+population predicate**: which files it draws from (git-tracked only), the full list of
+source extensions that count, the path substrings excluded (`/vendor/`, `/node_modules/`,
+`/src/test/`, …), the filename suffixes excluded (`_test.go`, …), *and* the generated-code
+rules that decide the rest — the exact suffixes (`.min.js`, `.d.ts`, …) and directory
+conventions (`/generated/`, `/mocks/`, …) that mark a file machine-written — every one
+sourced straight from the engine so it can't drift from the code. Nothing is left as a
+prose "e.g."; the membership rule is stated in full. An outsider rebuilds the number from
+`git ls-files` alone and confirms it lands *exactly* where we say — not approximately,
+which reads as an undisclosed fudge.
 That is the difference between a score you must *believe* and one you can *audit* — and it
 is why the number is worth gating a build on.
 
