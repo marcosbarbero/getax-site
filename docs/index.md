@@ -21,9 +21,10 @@ gate that blocks regressions on every push.
 
 ## Going deeper
 
-- **[Judgment — the model-graded probe](/docs/judgment/)** — the readiness questions a
-  deterministic check cannot answer (is this long file a monolith or a flat registry?),
-  asked of a model you configure. Opt-in, advisory, and it never moves your score.
+- **[GetAX in your agent's toolbelt (MCP)](/docs/mcp/)** — run GetAX as an MCP server your
+  coding agent connects to. It hands the agent your findings; the agent — which already
+  has your whole codebase in context — adjudicates them. Nothing leaves your machine, and
+  the score stays deterministic.
 
 ## Reference
 
