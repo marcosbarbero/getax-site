@@ -83,12 +83,14 @@ Five, spanning read and write:
 
 The oldest complaint about any readiness scanner is that a finding is a headline number
 you can only argue with by reproducing it. `explain_finding` answers that. It hands back
-the measured value, its ceiling, and the **evidence with its population named** — for
-file size, `N source files (line-weighted; excludes tests, generated, and vendored)`. An
-outsider can rebuild that number from `git ls-files` alone, with no reference to our
-implementation, and confirm it lands where we say. That is the difference between a score
-you must *believe* and one you can *audit* — and it is why the number is worth gating a
-build on.
+the measured value, its ceiling, and — for a signal like file size — the **exact
+population predicate**: the full list of source extensions that count, the path substrings
+excluded (`/vendor/`, `/node_modules/`, `/src/test/`, …), and the filename suffixes
+excluded (`_test.go`, `.pb.go`, …), sourced straight from the engine so it can't drift
+from the code. An outsider rebuilds the number from `git ls-files` alone and confirms it
+lands *exactly* where we say — not approximately, which reads as an undisclosed fudge.
+That is the difference between a score you must *believe* and one you can *audit* — and it
+is why the number is worth gating a build on.
 
 ## Load the companion skill
 
