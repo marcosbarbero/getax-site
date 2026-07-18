@@ -12,8 +12,5 @@ layout: default
   <h1>Agentic Experience governance</h1>
   <p>GetAX scores — deterministically — how ready a repository is for autonomous agents to
      work in, and shows the reasoning behind every point.</p>
-  <p><a href="/docs/configuration/">Configuration reference &amp; live validator &rarr;</a></p>
-  <p style="font-size:.9rem"><span style="color:var(--steel)">Schema:</span>
-     <a href="/schema/getax.v1.json"><code>/schema/getax.v1.json</code></a></p>
   <div class="foot" style="margin-top:2rem;font-family:var(--mono);font-size:.7rem;color:var(--steel)">More soon.</div>
 </div>
