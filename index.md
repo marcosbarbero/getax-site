@@ -10,7 +10,8 @@ layout: default
     <span class="lockup__w">get<i>ax</i></span>
   </div>
   <h1>Agentic Experience governance</h1>
-  <p>GetAX scores — deterministically — how ready a repository is for autonomous agents to
-     work in, and shows the reasoning behind every point.</p>
+  <p>GetAX scores how ready a repository is for autonomous agents — deterministically —
+     then shows where they'd get stuck and the cheapest path to fix it, with the reasoning
+     behind every point.</p>
   <div class="foot" style="margin-top:2rem;font-family:var(--mono);font-size:.7rem;color:var(--steel)">More soon.</div>
 </div>
