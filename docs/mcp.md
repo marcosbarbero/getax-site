@@ -52,11 +52,21 @@ Run it from the repository you want scored — the server works on the current d
 - **`get_readiness`** — the current AX score and its five signals. Deterministic.
 - **`get_findings`** — the ranked, attributed gaps a scan found, each a *candidate* to
   adjudicate: an id, the signal, the claim, and the points at stake.
-- **`propose_exemption`** — the agent's verdict on a finding. `confirmed` means it's real
-  and the agent will fix it. `refuted` means it's a false finding — and **must** carry a
-  `path:line` citation in your repo that justifies it. GetAX re-verifies that the citation
-  resolves and only then stages a verified-claim exemption into `.getax/`. An unverifiable
-  citation is rejected and the finding stands.
+- **`propose_exemption`** — the agent's verdict on a finding, one of three, chosen by
+  whether the finding is false, being fixed, or true-but-managed:
+  - **`confirmed`** — it's real and the agent will fix it. Nothing is staged; the
+    deduction stands until the code changes.
+  - **`refuted`** — it's *false*: the rule mis-measures your repo (say, a mandatory
+    `any` at a JSON boundary scored as an escape hatch). Must carry a `path:line`
+    citation proving it. GetAX re-verifies the citation and stages a verified-claim
+    exemption that **restores the points once you commit it.**
+  - **`managed`** — it's *true, but under a documented remediation policy* (a grandfather
+    clause, a shrink-only ratchet). Must cite the policy. GetAX records it; **no points
+    are restored** — the debt is real — but it's marked *tracked*, not pretended away.
+
+  Refute only what's false; *manage* what's true-but-policied — don't refute real debt
+  just because a grandfather clause exists. An unverifiable citation is rejected and the
+  finding stands.
 
 ## The loop
 
@@ -66,12 +76,16 @@ What happens:
 1. The agent calls **`get_findings`** and reads them with the context you don't have to
    give it — it already has the tree.
 2. For a **real** finding, it fixes the code and you re-run to watch the score rise.
-3. For a **false** one — a large file that's a flat registry, a rule your docs already
-   grandfather, a policy stated in an ADR — it calls **`propose_exemption`** with a
-   citation. GetAX verifies the citation and stages the exemption in `.getax/`.
-4. You **review the staged exemption in the diff and commit it.** It carries its reason and
-   its citation, so a teammate (or a future you) can see exactly why the number is what it
-   is.
+3. For a **false** one — a rule mis-measuring your repo, like a flat registry counted as a
+   monolith — it calls **`propose_exemption`** with verdict `refuted` and a citation that
+   *proves it's false*. GetAX verifies the citation and stages the exemption.
+4. For a finding that's **true but under a policy** — a monolith on a shrink-only ratchet,
+   a documented grandfather clause — it uses verdict `managed` and cites the policy. The
+   debt is recorded and stays visible; **no points come back**, because the debt is real.
+   This is the honest middle: you don't pretend it away, and you don't over-promise a fix.
+5. You **review the staged entries in the diff and commit them.** Each carries its reason
+   and citation, so a teammate (or a future you) can see exactly why the number is what it
+   is — and a refutation only moves the score once it's committed.
 
 That committed `.getax/` is the repo's memory: a newcomer who clones it inherits the
 settled adjudications, and GetAX stops re-raising what's already been answered.
@@ -84,3 +98,13 @@ claim GetAX re-checks against the actual files. It can never just *write a highe
 And an adjudication only touches the score of record once it's committed and reviewed;
 anything an agent quiets locally stays local and can't move the shared score. The judgment
 gets all the context it needs, and none of the power to lie about it.
+
+## Two things to know
+
+- **Reconnect after adding it mid-session.** If you `claude mcp add getax` while an agent
+  session is already running, the tools aren't live until the client reconnects. Add it,
+  then start (or restart) the session.
+- **`get_readiness` scores the build in your hands.** It runs the local scan, so the
+  number reflects your working tree and the CLI version you have installed — which can
+  differ from a floor committed by a teammate on a newer build. If a number surprises you,
+  check `getax version` against what set the baseline.
