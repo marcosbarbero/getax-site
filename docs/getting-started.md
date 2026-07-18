@@ -60,8 +60,10 @@ Two things to notice, because they are the point:
   *widens the confidence range* rather than scoring you a zero — so *adding* a report
   can only ever raise your certainty, never punish you for being honest.
 
-Below the signals, `scan` lists the **cheapest points to recover**, ranked — the
-shortest path up.
+Below the signals, `scan` lists **what to fix first**, ranked — led by what actually
+*blocks* an agent from working here (can it tell a change worked? can it hold the file?),
+then by points within. Not "the cheapest points": the gap that unblocks an agent can be
+worth fewer points than a cosmetic one, and it still comes first.
 
 ## 4. What next
 
