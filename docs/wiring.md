@@ -65,7 +65,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0            # full history — GetAX reads it for change-traceability
+          fetch-depth: 0            # full history: GetAX reads it for change-traceability AND co-change-coupling (under v5 a shallow clone blinds coupling)
       - run: npx getax check
         env:
           GETAX_LICENSE: ${{ secrets.GETAX_LICENSE }}   # your CLI key, as a repo secret

@@ -56,7 +56,7 @@ wrong in a way you cannot see.
 {
   "$schema": "https://getax.app/schema/getax.v1.json",
   "version": 1,
-  "model": "v3",
+  "model": "v5",
   "weights": { "T": 0.25, "B": 0.20, "D": 0.15, "S": 0.20, "E": 0.20 },
   "ignore": ["vendor/**", "**/*.generated.go"],
   "inputs": {
@@ -84,7 +84,7 @@ Must be `1`. The config format version (not the scoring model — that's `model`
 build that doesn't understand your version refuses to score rather than guess.
 
 ### `model` — required
-The scoring model version to pin, e.g. `"v3"`. **This is the most important field.**
+The scoring model version to pin, e.g. `"v5"`. **This is the most important field.**
 
 A CLI upgrade must **never silently move your score** — someone's CI ratchet depends
 on the number. Pinning the model means a new GetAX release scores you against the
@@ -95,6 +95,21 @@ or a penalty curve is a **model version bump plus an ADR** on our side, never a 
 A repo with no `.getax/settings.json` is *unpinned*: it gets the current model, and
 the report says so (`getax config` shows `model … default — not pinned`). Unpinned is
 fine for a first look; pin before you gate CI on the number.
+
+**The current default is `v5`.** The versions, and what each adds:
+
+- **`v5`** (default) — two correctness fixes over `v3`: a **defunct CI provider is not
+  credited** (a `.travis.yml` on a repo where Travis no longer runs is dead infrastructure,
+  not a pipeline), and **co-change-coupling blinds on a shallow clone** instead of reporting a
+  different number from truncated history. That second one matters in CI: `actions/checkout`
+  defaults to a depth-1 clone, so **set `fetch-depth: 0`** or your boundary score is measured
+  against a fraction of your history. See the [wiring guide](/docs/wiring/).
+- **`v4`** — adds verified-claim configuration (`exclude`, `posture`; see below). Opt-in, and
+  it does **not** include v5's fixes. If you rely on `exclude`/`posture` you pin `v4` today and
+  forgo the v5 correctness fixes; a version combining both is a known gap, not yet shipped.
+- **`v3`** — the previous default. Pin it to freeze exactly the behaviour you had before v5.
+
+Pinning `v3` or `v4` is fully supported — your score does not move until you change this line.
 
 ### `weights` — optional
 The five signal weights: `T` (determinism), `B` (context/boundaries), `D` (intent),
@@ -169,6 +184,11 @@ recomputes from**, never values it trusts. A raw `ignore` glob is trusted; a ver
 claim is *earned*. These require model **v4** — a repo that writes them under an older
 pin gets a clear error, never a silent no-op — and until you pin v4 nothing here
 affects your score.
+
+> **Tradeoff to know:** `v4` does not carry `v5`'s correctness fixes (defunct-CI and
+> shallow-clone handling). Pinning `v4` for `exclude`/`posture` today means forgoing those —
+> a version combining both is a known gap we haven't shipped. If you don't use `exclude`/
+> `posture`, stay on the `v5` default.
 
 ### `exclude` — verified exemptions
 Instead of trusting a glob, you make a claim about a set of paths, and the engine
@@ -273,7 +293,7 @@ merely asserted:
   getax configuration  .
 
   COMMITTED  .getax/settings.json — reviewed in the diff, may move the score
-    model       v3                pinned
+    model       v5                pinned
     version     1
     weights     default
     ignore      vendor/**
