@@ -1,0 +1,31 @@
+---
+layout: default
+permalink: /404.html
+title: Page not found
+description: That page isn't here. The GetAX docs — scoring, wiring it into CI, and the MCP integration — are.
+---
+<div class="hero">
+  <svg class="hero__mark" viewBox="0 0 64 64" aria-hidden="true">
+    <path d="M8 46 A 26 26 0 0 1 56 46" fill="none" stroke="#7C8794" stroke-width="3"/>
+    <path d="M32 48 L23 29 Q32 20 41 29 Z" fill="#D9541F"/>
+  </svg>
+  <div class="lockup lockup--lg">
+    <svg width="44" height="44" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M8 46 A 26 26 0 0 1 56 46" fill="none" stroke="#7C8794" stroke-width="4"/>
+      <path d="M32 48 L23 29 Q32 20 41 29 Z" fill="#D9541F"/>
+    </svg>
+    <span class="lockup__w">get<i>ax</i></span>
+  </div>
+  <div class="hero__eyebrow">404 · page not found</div>
+  <h1 class="hero__title">That path <span class="hero__em">doesn't resolve</span>.</h1>
+  <p class="hero__sub">The page you asked for isn't here — it may have moved, or the link may be
+     wrong. Everything we publish is one of these:</p>
+  <ul class="hero__links">
+    <li><a href="{{ '/' | relative_url }}">Home</a> — what GetAX is and why readiness is measurable</li>
+    <li><a href="{{ '/docs/getting-started/' | relative_url }}">Getting started</a> — scan a repository and read the score</li>
+    <li><a href="{{ '/docs/wiring/' | relative_url }}">Wiring</a> — make it a gate in CI, not a one-off report</li>
+    <li><a href="{{ '/docs/configuration/' | relative_url }}">Configuration</a> — <code>.getax/settings.json</code>, and which settings can move a score</li>
+    <li><a href="{{ '/docs/mcp/' | relative_url }}">MCP</a> — hand the findings to your own coding agent</li>
+  </ul>
+  <div class="hero__foot">Error 404</div>
+</div>

@@ -142,6 +142,10 @@ nav.side a.sub{padding-left:1.4rem;font-size:.72rem}
 .hero__em{color:var(--ember)}
 .hero__sub{font-size:1.08rem;line-height:1.62;color:var(--bone-dim);max-width:50ch;margin:0 0 2.6rem}
 .hero__foot{font-family:var(--mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--steel)}
+/* Signposts on the 404: the hero's own type, one rule, no new colours. */
+.hero__links{list-style:none;padding:0;margin:0 0 2.6rem;max-width:52ch;border-left:1px solid var(--etch)}
+.hero__links li{padding:.42rem 0 .42rem 1.1rem;color:var(--bone-dim);font-size:1rem;line-height:1.5}
+.hero__links a{font-weight:600}
 /* Live validator */
 .validator{margin:2.4rem 0}
 .validator textarea{width:100%;min-height:13rem;font-family:var(--mono);font-size:.82rem;line-height:1.6;
