@@ -52,10 +52,12 @@ Run it from the repository you want scored — the server works on the current d
 Five, spanning read and write:
 
 - **`get_readiness`** — the current AX score and its five signals. Deterministic.
-- **`get_findings`** — the ranked, attributed gaps a scan found, each a *candidate* to
-  adjudicate: an id, the signal, the claim, and the points at stake. Findings settled in a
-  prior session come back separately, under `already_adjudicated`, so the agent isn't
-  re-shown what's already decided.
+- **`get_findings`** — the attributed gaps a scan found, each a *candidate* to adjudicate: an
+  id, the signal, the claim, the points at stake, and `blocks` (whether it stops an agent from
+  working here). The list is ordered **what-to-fix-first — blockers first, then points** — not
+  by raw points, so keep the order rather than re-sorting on `points`. Findings settled in a
+  prior session come back separately, under `already_adjudicated`, so the agent isn't re-shown
+  what's already decided.
 - **`explain_finding`** — the full evidence behind one finding (a `Signal/Key` id): the
   sub-signal's measured value, its ceiling, the specific evidence the scan saw, and any
   blind-spot note. Call it before adjudicating something you're unsure about — decide on
