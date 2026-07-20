@@ -56,7 +56,7 @@ wrong in a way you cannot see.
 {
   "$schema": "https://getax.app/schema/getax.v1.json",
   "version": 1,
-  "model": "v5",
+  "model": "v6",
   "weights": { "T": 0.25, "B": 0.20, "D": 0.15, "S": 0.20, "E": 0.20 },
   "ignore": ["vendor/**", "**/*.generated.go"],
   "inputs": {
@@ -84,7 +84,7 @@ Must be `1`. The config format version (not the scoring model — that's `model`
 build that doesn't understand your version refuses to score rather than guess.
 
 ### `model` — required
-The scoring model version to pin, e.g. `"v5"`. **This is the most important field.**
+The scoring model version to pin, e.g. `"v6"`. **This is the most important field.**
 
 A CLI upgrade must **never silently move your score** — someone's CI ratchet depends
 on the number. Pinning the model means a new GetAX release scores you against the
@@ -96,18 +96,24 @@ A repo with no `.getax/settings.json` is *unpinned*: it gets the current model, 
 the report says so (`getax config` shows `model … default — not pinned`). Unpinned is
 fine for a first look; pin before you gate CI on the number.
 
-**The current default is `v5`.** The versions, and what each adds:
+**The current default is `v6`.** The versions, and what each adds:
 
-- **`v5`** (default) — two correctness fixes over `v3`: a **defunct CI provider is not
-  credited** (a `.travis.yml` on a repo where Travis no longer runs is dead infrastructure,
-  not a pipeline), and **co-change-coupling blinds on a shallow clone** instead of reporting a
-  different number from truncated history. That second one matters in CI: `actions/checkout`
-  defaults to a depth-1 clone, so **set `fetch-depth: 0`** or your boundary score is measured
-  against a fraction of your history. See the [wiring guide](/docs/wiring/).
-- **`v4`** — adds verified-claim configuration (`exclude`, `posture`; see below). Opt-in, and
-  it does **not** include v5's fixes. If you rely on `exclude`/`posture` you pin `v4` today and
-  forgo the v5 correctness fixes; a version combining both is a known gap, not yet shipped.
-- **`v3`** — the previous default. Pin it to freeze exactly the behaviour you had before v5.
+- **`v6`** (default) — everything below, plus the two that changed what a score *means*:
+  a **blind sub-signal no longer scores as well as your measured average**. It is priced at
+  an empirical prior (0.700 — the median measured value across a corpus of real repositories),
+  so publishing a merely-good measurement *raises* your score instead of lowering it. Before
+  this, hiding a test report beat publishing one. And a **test report is scored only if you
+  declare it** in `inputs.junit` — an auto-discovered one is build output, so scoring it made
+  the same commit score differently depending on which suite ran last.
+- **`v5`** — a **defunct CI provider is not credited** (a `.travis.yml` where Travis no longer
+  runs is dead infrastructure, not a pipeline), and **co-change-coupling blinds on a shallow
+  clone** rather than reporting a different number from truncated history. That one matters in
+  CI: `actions/checkout` defaults to a depth-1 clone, so **set `fetch-depth: 0`**. See the
+  [wiring guide](/docs/wiring/).
+- **`v4`** — verified-claim configuration (`exclude`, `posture`; see below), *without* v5's or
+  v6's fixes. If you pinned v4 for `exclude`/`posture`, **v6 now carries both** — it is the
+  first version that does, and moving to it is a one-line change.
+- **`v3`** — the model before any of the above.
 
 Pinning `v3` or `v4` is fully supported — your score does not move until you change this line.
 
@@ -126,6 +132,13 @@ changes what is measured), so it's committed.
 ### `inputs` — optional
 Where your build reports actually are, when they aren't where the conventions guess.
 Four kinds: `coverage`, `junit`, `sarif`, `openapi` — each an array of path globs.
+
+Under the **`v6` default this is load-bearing for `junit`**: a test report is scored *only*
+if you declare it here. An auto-discovered report is build output — it exists only after a
+run, and says whatever that run said — so scoring it would make the same commit score
+differently depending on which suite ran last on which machine. Declare a **glob**, not a
+directory (`["build/test-results/**/*.xml"]`); a pin that matches nothing is reported loudly
+rather than silently ignored.
 
 This matters most for **coverage**: coverage reports are build artifacts (gitignored,
 produced wherever your build puts them), so any path GetAX hard-codes is a guess about
@@ -181,14 +194,12 @@ and looks like it worked. Tell us your labels; we won't guess them.
 
 The principle (ADR-0020): committed config supplies **claims the engine verifies and
 recomputes from**, never values it trusts. A raw `ignore` glob is trusted; a verified
-claim is *earned*. These require model **v4** — a repo that writes them under an older
-pin gets a clear error, never a silent no-op — and until you pin v4 nothing here
-affects your score.
+claim is *earned*. These require a **Claims-capable model — `v4` or `v6`** — and a repo that
+writes them under an older pin gets a clear error, never a silent no-op.
 
-> **Tradeoff to know:** `v4` does not carry `v5`'s correctness fixes (defunct-CI and
-> shallow-clone handling). Pinning `v4` for `exclude`/`posture` today means forgoing those —
-> a version combining both is a known gap we haven't shipped. If you don't use `exclude`/
-> `posture`, stay on the `v5` default.
+> **Prefer `v6`.** `v4` carries verified claims but none of the correctness fixes that came
+> after it; `v6` carries both, and it is the default. If you pinned `v4` only to get
+> `exclude`/`posture`, moving to `v6` is a one-line change that costs you nothing.
 
 ### `exclude` — verified exemptions
 Instead of trusting a glob, you make a claim about a set of paths, and the engine
@@ -293,7 +304,7 @@ merely asserted:
   getax configuration  .
 
   COMMITTED  .getax/settings.json — reviewed in the diff, may move the score
-    model       v5                pinned
+    model       v6                pinned
     version     1
     weights     default
     ignore      vendor/**

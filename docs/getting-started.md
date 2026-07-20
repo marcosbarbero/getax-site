@@ -33,7 +33,7 @@ the score is computed locally.
 ## 3. Read the score
 
 ```
-AX 74  C   model v5   confidence 0.78
+AX 74  C   model v6   confidence 0.78
 ├─ T determinism     54   coverage 41% · suite <5m · mutation UNMEASURED (blind spot)
 ├─ B boundaries      82   82% of files under 400 lines an agent can read whole
 ├─ D intent         100   README, CLAUDE.md, ADRs, and every commit traces to intent
