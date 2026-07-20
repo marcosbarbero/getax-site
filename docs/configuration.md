@@ -56,7 +56,7 @@ wrong in a way you cannot see.
 {
   "$schema": "https://getax.app/schema/getax.v1.json",
   "version": 1,
-  "model": "v6",
+  "model": "v7",
   "weights": { "T": 0.25, "B": 0.20, "D": 0.15, "S": 0.20, "E": 0.20 },
   "ignore": ["vendor/**", "**/*.generated.go"],
   "inputs": {
@@ -84,7 +84,7 @@ Must be `1`. The config format version (not the scoring model — that's `model`
 build that doesn't understand your version refuses to score rather than guess.
 
 ### `model` — required
-The scoring model version to pin, e.g. `"v6"`. **This is the most important field.**
+The scoring model version to pin, e.g. `"v7"`. **This is the most important field.**
 
 A CLI upgrade must **never silently move your score** — someone's CI ratchet depends
 on the number. Pinning the model means a new GetAX release scores you against the
@@ -96,9 +96,16 @@ A repo with no `.getax/settings.json` is *unpinned*: it gets the current model, 
 the report says so (`getax config` shows `model … default — not pinned`). Unpinned is
 fine for a first look; pin before you gate CI on the number.
 
-**The current default is `v6`.** The versions, and what each adds:
+**The current default is `v7`** — and the newest model is always the default, so a fresh
+install scores you against our best current thinking. **Pinning freezes you**: your score never
+moves under you until you change this line. The versions, and what each adds:
 
-- **`v6`** (default) — everything below, plus the two that changed what a score *means*:
+- **`v7`** (default) — everything below, plus: a **habit needs enough history to be a habit**.
+  `change-traceability` is a ratio over commits, and at five commits one commit swings it twenty
+  points, so below 20 commits it reports a blind spot instead of a confident percentage. A young
+  repo has not earned the claim and has not failed it either. (`co-change-coupling` has always
+  worked this way; now they agree.)
+- **`v6`** — the two that changed what a score *means*:
   a **blind sub-signal no longer scores as well as your measured average**. It is priced at
   an empirical prior (0.700 — the median measured value across a corpus of real repositories),
   so publishing a merely-good measurement *raises* your score instead of lowering it. Before
@@ -115,7 +122,7 @@ fine for a first look; pin before you gate CI on the number.
   first version that does, and moving to it is a one-line change.
 - **`v3`** — the model before any of the above.
 
-Pinning `v3` or `v4` is fully supported — your score does not move until you change this line.
+Pinning any older version is fully supported — your score does not move until you change this line.
 
 ### `weights` — optional
 The five signal weights: `T` (determinism), `B` (context/boundaries), `D` (intent),
@@ -304,7 +311,7 @@ merely asserted:
   getax configuration  .
 
   COMMITTED  .getax/settings.json — reviewed in the diff, may move the score
-    model       v6                pinned
+    model       v7                pinned
     version     1
     weights     default
     ignore      vendor/**
